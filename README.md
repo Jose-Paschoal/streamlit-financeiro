@@ -50,11 +50,3 @@ Editar
 
 Se quiser, posso adaptar conforme o tema do projeto (ex: score, análise de dados, dashboard etc). É só me avisar.
 
-
-
-
-
-
-
-
-Perguntar ao ChatGPT
