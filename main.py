@@ -1,3 +1,4 @@
+from multiprocessing import Value
 import streamlit as st
 
 import pandas as pd
@@ -130,3 +131,49 @@ if file_upload:
          ]
 
          st.line_chart(data=df_stats[rel_cols])
+
+    
+    ## criando uma aba de metas
+
+    with st.expander('Metas'):
+         
+         ## criando colunas para não deixar os dados empilhados
+
+         col1, col2 = st.columns(2)
+         
+         data_inicio_meta = col1.date_input('Início da Meta', max_value = df_stats.index.max())
+         data_filtrada =  df_stats.index[df_stats.index <= data_inicio_meta][-1]
+
+         custos_fixos = col1.number_input('Custos Fixos', min_value=0., format='%.2f')
+
+         salario_bruto = col2.number_input('Salário Bruto', min_value=0., format='%.2f')
+         salario_liquido = col2.number_input('Salário Líquido', min_value=0., format='%.2f')
+
+         valor_inicio = df_stats.loc[data_filtrada]['Valor']
+         col1.markdown(f'**Patrimônio no Início da Meta**: R$ {valor_inicio:.2f}')
+
+         ## criando outra estrutura de coluna
+
+         col1_pot, col2_pot = st.columns(2)
+         mensal = salario_liquido - custos_fixos
+         anual = mensal * 12
+
+         with col1_pot.container(border=True):
+         
+            st.markdown(f"""**Potencial Arrecadação Mês**:\n\n R$ {mensal:.2f}""")
+
+         with col2_pot.container(border=True):
+            
+            st.markdown(f"""**Potencial Arrecadação Anual**:\n\n R$ {anual:.2f}""")
+
+         with st.container(border=True):
+            col1_meta, col2_meta = st.columns(2)
+            with col1_meta:
+
+               meta_estipulada = st.number_input('Meta Estipulada', min_value=0., format='%.2f', value=anual)
+
+            with col2_meta:
+
+               patrimonio_final = meta_estipulada + valor_inicio
+               st.markdown(f"Patrimônio Estimado pós meta:\n\n R$ {patrimonio_final:.2f}")
+         
