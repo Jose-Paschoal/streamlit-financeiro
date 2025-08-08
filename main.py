@@ -153,6 +153,7 @@ if file_upload:
 
     with st.expander('Metas'):
          
+        # tab_main, tab_data, tab_graph = st.tabs(tabs=['Configuração', 'Dados', 'Gráficos'])
          ## criando colunas para não deixar os dados empilhados
 
          col1, col2 = st.columns(2)
@@ -208,4 +209,23 @@ if file_upload:
 
                patrimonio_final = meta_estipulada + valor_inicio
                st.markdown(f"Patrimônio Estimado pós meta:\n\n R$ {patrimonio_final:.2f}")
+
+         meses = pd.DataFrame({
+             'Data Referência':[data_inicio_meta + pd.DateOffset(months=i) for i in range(1,13)],
+             'Meta Mensal': [valor_inicio + round(meta_estipulada/12,2) * i for i in range(1,13)],
+             
+             })
+         meses['Data Referência'] = meses['Data Referência'].dt.strftime('%Y-%m')
+         
+
+         df_patrimonio = df_stats.reset_index()[['Data', 'Valor']]
+         df_patrimonio['Data Referência'] = pd.to_datetime(df_patrimonio['Data']).dt.strftime('%Y-%m')
+         meses = meses.merge(df_patrimonio, how='left', on='Data Referência')
+
+         meses = meses[['Data Referência', 'Meta Mensal', 'Valor']]
+         meses['Atingimento (%)'] = meses['Valor'] / meses['Meta Mensal']
+
+         meses['Atingimento Ano'] = meses['Valor'] / patrimonio_final
+
+         st.dataframe(meses)
          
